@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>PKS - DNS návod</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css'><link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!-- USING BOOTSTRAP 3.0.3 -->
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav pull-right">
+        <li><a href="#clanek1">DNS</a></li>
+        <li><a href="#clanek2">návod na bind9</a></li>
+        <li><a href="#clanek3">návod na knot</a></li>
+          <li><a href="#clanek4">Literatura</a></li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div>
+</nav>
+
+<div class="container">
+  
+
+  <div class="text-center">
+    <h1 id="clanek1">Co je to DNS</h1>
+  <p>DNS (Domain Name System) je hierarchický, decentralizovaný systém doménových jmen,
+    který je realizován servery DNS a protokolem stejného jména, kterým si vyměňují informace.
+    Jeho hlavním úkolem a příčinou vzniku jsou vzájemné převody doménových jmen a IP adres uzlů sítě. Později ale přibral další funkce
+    (např. pro elektronickou poštu či IP telefonii) a slouží dnes de facto jako distribuovaná databáze síťových informací.</p>
+
+      <h3>Jak funguje DNS?</h3>
+      <img src="010.PNG" alt="zone" class="center" >
+
+      <h3>Domény</h3>
+      <img src="003.PNG" alt="zone" class="center" >
+      <img src="002.PNG" alt="zone" class="center" >
+
+
+
+
+
+   <!-- /.text-center -->
+
+  <h1 id="clanek2">Návod pro bind9</h1>
+
+  <p>První věc co se musí udělat pokaždé, je aktualizace balíčků pomocí příkazu a instalace bind9 na <b>vašem přiděleném PC!</b></p>
+
+      <p><b>sudo apt update</b></p>
+      <p><b>sudo apt install bind9</b></p>
+
+      <p>Dalším krokem bude najít soubor <b>named.conf.default-zones</b>, ze kterého budeme kopírovat zónu localhost, která má typ master.
+          Následně ji budeme vkládat do named.conf. Aby jsme mohli text kopírovat, použijeme příkaz <b>nano</b></p>
+
+      <p><b>nano /etc/bind/named.conf.default-zones</b></p>
+
+      <p>Zde najdeme</p>
+
+      <img src="001.PNG" alt="zone" class="center">
+
+      <p>Tuto část budeme kopírovat do souboru named.conf. Najdeme si tedy soubor named.conf pomocí následujícího příkazů. <b>Tentokrát využijte sudo, jinak soubor nepřepíšete!</b></p>
+
+      <p><b>sudo nano /etc/bind/named.conf.default-zones</b></p>
+
+      <p>Zde použijeme zónu a za komentujeme soubor <b>named.conf.default-zones, jelikož už používáme zónu z tohoto souboru.</b>
+          Pokud nevíme, jestli soubor neobsahuje chybu, spustíme si kontrolu příkazem <b>named-checkconf /etc/bind/named.conf</b></p>
+
+      <img src="004.PNG" alt="zone" class="center">
+
+      <p>Do named.conf přidáme další zónu.</p>
+
+      <img src="007.PNG" alt="zone" class="center">
+
+      <p>K tomu si vytvoříme složku  <b>sudo mkdir /etc/bind/zones</b>. Abychom nemuseli celý zónový soubor vytvářet znovu, tak si zkopírujeme soubor db.local.
+          To provedeme pomoci příkazů <b>sudo cp /etc/bind/db.local /etc/bind/zones/example.com.zone</b></p>
+
+      <p>Soubor si otevřeme pomocí nano a upravíme ho podle potřeb. Za Serial pro přehlednost, doporučuji dát datum.</p>
+      <img src="008.PNG" alt="zone" class="center">
+
+      <p>Pozor na tečky, pokud nevíme jestli máme soubor správně napsaný, využít příkaz <b>named-checkzone example.com /etc/bind/zones/example.com.zone.</b> Takto vypadá správná kontrola</p>
+      <img src="009.PNG" alt="zone" class="center">
+
+      <p>Nyní si restartujeme bind9 pomocí příkazu <b>sudo systemctl restart bind9.service</b> a otevřeme si nový příkazový řádek.
+          Do něj vložíme příkaz <b>sudo systemctl status bind9.service</b>, tímto ověříme že základ pro DNS je funkční. K tomu si přidáme <b>dig @::1 example.com</b> a ověříme si, že dostaneme odpověď</p>
+
+      <img src="011.PNG" alt="zone" class="center">
+      <img src="012.PNG" alt="zone" class="center">
+
+      <p><b>Bind9 je velice háklivý na jakoukoliv mezeru, takže si na to dejte pozor!</b></p>
+
+      <h1 id="clanek3">Návod pro knot</h1>
+
+      <p>První věc co se musí udělat pokaždé, je aktualizace balíčků pomocí příkazu a instalace bind9 na <b>vašem přiděleném PC!</b></p>
+      <p><b>sudo apt update</b></p>
+      <p><b>sudo apt install knot</b></p>
+
+      <p>Po nainstalování si upravíme soubor knot.conf pomocí příkazu <b>sudo nano /etc/knot/knot.conf</b></p>
+      <img src="013.PNG" alt="zone" class="center">
+      <p>Vytvoříme si example.com.zone podle <a href="https://gitlab.nic.cz/knot/knot-dns/-/blob/master/samples/example.com.zone">Knot DNS Example</a></p>
+
+      <p>Pomocí příkazů sudo nano <b>/etc/knot/knot/example.com.zone</b></p>
+
+      <img src="014.PNG" alt="zone" class="center">
+
+  <h3 id="clanek4">Literatura</h3>
+
+      <b></b>
+      <p></p>
+
+
+      <p><a href="https://www.knot-dns.cz/docs/2.6/html/configuration.html">Knot dokumentace</a></p>
+    <p><a href="https://www.digitalocean.com/community/tutorials/how-to-configure-bind-as-a-private-network-dns-server-on-ubuntu-18-04">DigitalOcean tutorial</a></p>
+      <p> <a href="https://www.nic.cz/page/312/o-domenach-a-dns/">www.nic.cz - DNS</a></p>
+      <p>Domain Name Server - doc. Ing. Jaroslav Zdrálek, PhD.</p>
+
+
+  </div>
+</div> <!-- /.container -->
+<!-- partial -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script><script  src="./script.js"></script>
+
+</body>
+</html>
